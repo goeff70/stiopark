@@ -7,7 +7,22 @@ const reservationDialog = document.getElementById('reservation-dialog')
 const reservationForm = document.getElementById('reservation-form')
 const reservationError = document.getElementById('reservation-error')
 const message = document.getElementById('dashboard-message')
+const messageContent = message.querySelector('.dashboard-message-content')
 const validPurposes = new Set(['Enrollment', 'Payment', 'Classes', 'TESDA', 'Other'])
+const startTimes = [
+  '7:00 AM', '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM',
+  '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
+  '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM',
+  '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM',
+  '7:00 PM', '7:30 PM',
+]
+const endTimes = [
+  '7:30 AM', '8:00 AM', '8:30 AM', '9:00 AM', '9:30 AM', '10:00 AM',
+  '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '1:00 PM',
+  '1:30 PM', '2:00 PM', '2:30 PM', '3:00 PM', '3:30 PM', '4:00 PM',
+  '4:30 PM', '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', '7:00 PM',
+  '7:30 PM', '8:00 PM',
+]
 let currentAccount
 let selectedLane
 
@@ -67,14 +82,70 @@ function saveReservations(reservations) {
 }
 
 function showMessage(text, isError = false) {
-  message.textContent = text
+  messageContent.textContent = text
   message.dataset.error = String(isError)
   message.hidden = false
+  window.setTimeout(() => {
+    if (messageContent.textContent === text) message.hidden = true
+  }, 3000)
 }
 
-function toLocalDateTimeValue(date) {
+function parseTimeValue(value) {
+  const [time, period] = value.split(' ')
+  let [hours, minutes] = time.split(':').map(Number)
+  if (period === 'AM' && hours === 12) hours = 0
+  else if (period === 'PM' && hours !== 12) hours += 12
+  return hours * 60 + minutes
+}
+
+function getLocalDateTimeValue(date) {
   const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
   return localDate.toISOString().slice(0, 16)
+}
+
+function dateForSlot(value, baseDate) {
+  const date = new Date(baseDate)
+  const [time, period] = value.split(' ')
+  let [hours, minutes] = time.split(':').map(Number)
+  if (period === 'AM' && hours === 12) hours = 0
+  else if (period === 'PM' && hours !== 12) hours += 12
+  date.setHours(hours, minutes, 0, 0)
+  return date
+}
+
+function createTimeSelector(laneNumber, kind, times, selectedTime) {
+  const group = document.createElement('div')
+  group.className = 'timeSelectorGroup'
+
+  const label = document.createElement('label')
+  label.className = 'timeLabel'
+  label.htmlFor = `lane${laneNumber}-${kind}`
+  label.textContent = kind === 'start' ? 'Start Time' : 'End Time'
+
+  const select = document.createElement('select')
+  select.className = 'timeSelector'
+  select.id = `lane${laneNumber}-${kind}`
+  times.forEach((time) => {
+    const option = document.createElement('option')
+    option.value = time
+    option.textContent = time
+    option.selected = time === selectedTime
+    select.append(option)
+  })
+
+  group.append(label, select)
+  return group
+}
+
+function getDefaultTimes(now) {
+  const currentMinutes = now.getHours() * 60 + now.getMinutes()
+  const nextSlotMinutes = Math.ceil((currentMinutes + 1) / 30) * 30
+  const nextStart = startTimes.find((time) => parseTimeValue(time) >= nextSlotMinutes)
+  if (!nextStart) return { start: startTimes[0], end: endTimes[2] }
+
+  const nextStartMinutes = parseTimeValue(nextStart)
+  const nextEnd = endTimes.find((time) => parseTimeValue(time) > nextStartMinutes)
+  return { start: nextStart, end: nextEnd || endTimes[endTimes.length - 1] }
 }
 
 function formatReservationTime(value) {
@@ -95,60 +166,63 @@ function removeExpiredReservations(reservations, now) {
 }
 
 function createLaneCard(laneNumber, reservations, now, ownReservation) {
-  const card = document.createElement('article')
-  card.className = 'lane-card'
-
-  const heading = document.createElement('h3')
-  heading.className = 'lane-title'
-  heading.textContent = `Lane ${laneNumber}`
-
-  const status = document.createElement('p')
-  status.className = 'lane-status'
-
-  const detail = document.createElement('p')
-  detail.className = 'lane-details'
+  const card = document.createElement('div')
+  card.className = 'laneCard'
 
   const button = document.createElement('button')
   button.type = 'button'
-  button.className = 'form-btn form-btn--submit lane-action'
+  button.className = 'laneButton'
+
+  const buttonContent = document.createElement('span')
+  buttonContent.className = 'laneButtonContent'
+  const laneName = document.createElement('span')
+  laneName.textContent = `Lane ${laneNumber}`
+  const laneState = document.createElement('span')
+  laneState.className = 'laneButtonState'
+  buttonContent.append(laneName, laneState)
+  button.append(buttonContent)
 
   const laneReservation = reservations.find((reservation) => reservation.lane === laneNumber)
-  if (laneReservation) {
-    const isMine = laneReservation.email === currentAccount.email
-    const isInProgress = Date.parse(laneReservation.start) <= now
-    card.classList.add('lane-card--reserved')
-    status.textContent = isMine
-      ? isInProgress
-        ? 'Your reservation'
-        : 'Scheduled by you'
-      : isInProgress
-        ? 'Reserved'
-        : 'Booked later'
-    detail.textContent = `${isMine ? 'Your booking' : 'A demo booking on this device'}: ${reservationDetails(laneReservation)}`
+  const isMine = laneReservation?.email === currentAccount.email
+  const isOccupied = laneReservation &&
+    Date.parse(laneReservation.start) <= now &&
+    Date.parse(laneReservation.end) > now
 
-    if (isMine) {
-      button.textContent = 'Cancel my reservation'
-      button.addEventListener('click', () => cancelReservation(laneReservation.id))
-    } else {
-      button.textContent = isInProgress ? 'Currently reserved' : 'Reserve another time'
-      button.disabled = isInProgress || Boolean(ownReservation)
-      if (!button.disabled) {
-        button.addEventListener('click', () => openReservationDialog(laneNumber))
-      }
-    }
+  if (isMine) {
+    button.classList.add('is-clicked')
+    button.disabled = true
+    laneState.textContent = 'Reserved by you'
+  } else if (isOccupied) {
+    button.classList.add('is-occupied')
+    button.disabled = true
+    laneState.textContent = 'Reserved'
   } else {
-    status.textContent = 'Available'
-    detail.textContent = ownReservation
-      ? 'Cancel your existing reservation before booking another lane.'
-      : 'Choose this lane to make a demo reservation.'
-    button.textContent = ownReservation ? 'One reservation at a time' : 'Reserve this lane'
+    button.classList.add('is-vacant')
     button.disabled = Boolean(ownReservation)
-    if (!button.disabled) {
-      button.addEventListener('click', () => openReservationDialog(laneNumber))
-    }
+    laneState.textContent = laneReservation ? 'Booked later' : 'Vacant'
+    if (!button.disabled) button.addEventListener('click', () => openReservationDialog(laneNumber))
   }
 
-  card.append(heading, status, detail, button)
+  const times = getDefaultTimes(new Date(now))
+  const startSelector = createTimeSelector(laneNumber, 'start', startTimes, times.start)
+  const endSelector = createTimeSelector(laneNumber, 'end', endTimes, times.end)
+  const details = document.createElement('p')
+  details.className = 'laneReservationDetails'
+  details.textContent = laneReservation
+    ? `${isMine ? 'Your reservation' : 'Booked'}: ${reservationDetails(laneReservation)}`
+    : ownReservation
+      ? 'Cancel your current reservation first.'
+      : 'Select a time and click the lane to reserve.'
+
+  card.append(button, startSelector, endSelector, details)
+  if (isMine) {
+    const cancelButton = document.createElement('button')
+    cancelButton.type = 'button'
+    cancelButton.className = 'laneCancelButton'
+    cancelButton.textContent = 'Unreserve'
+    cancelButton.addEventListener('click', () => cancelReservation(laneReservation.id))
+    card.append(cancelButton)
+  }
   return card
 }
 
@@ -171,15 +245,19 @@ function openReservationDialog(laneNumber) {
   reservationError.hidden = true
   document.getElementById('reservation-title').textContent = `Reserve Lane ${laneNumber}`
 
-  const start = new Date(Date.now() + 15 * 60 * 1000)
-  start.setMinutes(Math.ceil(start.getMinutes() / 15) * 15, 0, 0)
-  const end = new Date(start.getTime() + 60 * 60 * 1000)
+  const now = new Date()
+  const startTime = document.getElementById(`lane${laneNumber}-start`).value
+  const endTime = document.getElementById(`lane${laneNumber}-end`).value
+  const start = dateForSlot(startTime, now)
+  if (start <= now) start.setDate(start.getDate() + 1)
+  const end = dateForSlot(endTime, start)
+  if (parseTimeValue(endTime) <= parseTimeValue(startTime)) end.setDate(end.getDate() + 1)
   const startInput = document.getElementById('reservation-start')
   const endInput = document.getElementById('reservation-end')
-  startInput.min = toLocalDateTimeValue(new Date())
-  startInput.value = toLocalDateTimeValue(start)
+  startInput.min = getLocalDateTimeValue(now)
+  startInput.value = getLocalDateTimeValue(start)
   endInput.min = startInput.value
-  endInput.value = toLocalDateTimeValue(end)
+  endInput.value = getLocalDateTimeValue(end)
   reservationDialog.showModal()
 }
 
@@ -207,6 +285,34 @@ document.getElementById('reservation-start').addEventListener('change', (event) 
 
 document.getElementById('close-dialog').addEventListener('click', () => {
   reservationDialog.close()
+})
+
+document.getElementById('current-year').textContent = new Date().getFullYear()
+document.getElementById('signout-button').addEventListener('click', (event) => {
+  event.preventDefault()
+  sessionStorage.removeItem(SESSION_KEY)
+  localStorage.removeItem(REMEMBERED_USER_KEY)
+  window.location.assign('./index.html')
+})
+
+const infoContent = {
+  about: ['About oPark', 'oPark is a parking reservation demo for STI College Malaybalay.'],
+  contact: ['Contact', 'For inquiries, please contact the STI College Malaybalay administration.'],
+  services: ['STI Services', 'This browser-only demo does not connect to STI services.'],
+}
+
+document.querySelectorAll('[data-info]').forEach((link) => {
+  link.addEventListener('click', (event) => {
+    event.preventDefault()
+    const [title, content] = infoContent[link.dataset.info]
+    document.getElementById('info-title').textContent = title
+    document.getElementById('info-message').textContent = content
+    document.getElementById('info-dialog').showModal()
+  })
+})
+
+document.getElementById('close-info-dialog').addEventListener('click', () => {
+  document.getElementById('info-dialog').close()
 })
 
 reservationForm.addEventListener('submit', (event) => {
@@ -279,8 +385,6 @@ try {
     window.location.replace('./index.html')
   } else {
     document.getElementById('dashboard-user-name').textContent = currentAccount.name
-    document.getElementById('dashboard-user-email').textContent = currentAccount.email
-    document.getElementById('dashboard-user-plate').textContent = currentAccount.plate
     renderLanes()
     window.setInterval(() => {
       try {

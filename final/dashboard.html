@@ -14,37 +14,45 @@
     <script type="module" src="./src/demo-dashboard.js"></script>
   </head>
   <body>
-    <main class="demo-dashboard-page">
+    <main id="root">
       <header class="dashboard-header">
-        <div>
-          <p class="dashboard-kicker">STI College · oPark</p>
-          <h1>Parking Dashboard</h1>
-        </div>
-        <div class="dashboard-user">
-          <span id="dashboard-user-name"></span>
-          <button type="button" class="dashboard-signout" id="signout-button">Sign Out</button>
-        </div>
+        <nav class="dashboard-nav" aria-label="Main navigation">
+          <ul>
+            <li><a href="#" id="signout-button">Logout</a></li>
+            <li><a href="#about" data-info="about">About</a></li>
+            <li><a href="#contact" data-info="contact">Contact</a></li>
+            <li><a href="#services" data-info="services">Services</a></li>
+            <li><span class="dashboard-user" id="dashboard-user-name"></span></li>
+          </ul>
+        </nav>
       </header>
 
-      <aside class="demo-notice dashboard-notice">
-        Browser demo only: lane availability and reservations are saved on this
-        device. They are not live, shared, or connected to the parking sensors.
-      </aside>
-
-      <section class="dashboard-section" aria-labelledby="lane-heading">
-        <div class="section-heading">
-          <div>
-            <p class="dashboard-kicker">Reservations</p>
-            <h2 id="lane-heading">Choose a parking lane</h2>
-          </div>
-          <p class="account-summary">
-            Signed in as <strong id="dashboard-user-email"></strong>
-            <span> · Plate <strong id="dashboard-user-plate"></strong></span>
-          </p>
+      <div class="statusLegend" aria-label="Parking status legend">
+        <div class="legendItem">
+          <img src="./src/assets/green-square.svg" alt="" class="legendIcon" />
+          <span>Vacant</span>
         </div>
-        <p id="dashboard-message" class="dashboard-message" role="status" aria-live="polite" hidden></p>
-        <div id="lane-list" class="lane-list" aria-live="polite"></div>
-      </section>
+        <div class="legendItem">
+          <img src="./src/assets/red-square.svg" alt="" class="legendIcon" />
+          <span>Occupied</span>
+        </div>
+        <div class="legendItem">
+          <img src="./src/assets/blue-square.svg" alt="" class="legendIcon" />
+          <span>Reserved</span>
+        </div>
+        <aside class="demo-notice">
+          Demo only: lane availability and reservations are stored in this browser,
+          not live or connected to parking sensors.
+        </aside>
+      </div>
+
+      <p id="dashboard-message" class="dashboard-message" role="status" aria-live="polite" hidden>
+        <span class="dashboard-message-content"></span>
+      </p>
+      <section id="lane-list" class="lanesContainer" aria-label="Parking lanes" aria-live="polite"></section>
+      <footer>
+        <p>&copy; <span id="current-year"></span> STI College Malaybalay · Browser demo only</p>
+      </footer>
 
       <dialog id="reservation-dialog" class="reservation-dialog">
         <form id="reservation-form">
@@ -72,6 +80,12 @@
             <button type="submit" class="form-btn form-btn--submit">Confirm reservation</button>
           </div>
         </form>
+      </dialog>
+
+      <dialog id="info-dialog" class="info-dialog">
+        <h2 id="info-title"></h2>
+        <p id="info-message"></p>
+        <button type="button" id="close-info-dialog">Close</button>
       </dialog>
     </main>
   </body>

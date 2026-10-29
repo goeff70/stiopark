@@ -1,256 +1,456 @@
+:root {
+  color-scheme: light;
+  color: #08060d;
+  background: #fff;
+  font: 18px/145% system-ui, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: 0.18px;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
 body {
   min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  background-image: url(./assets/bg.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+#root {
+  width: 1126px;
+  max-width: 100%;
   min-height: 100vh;
-}
-
-.demo-dashboard-page {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto;
-  padding: 28px 0 56px;
-}
-
-.dashboard-header,
-.section-heading,
-.dashboard-user {
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  flex-direction: column;
+  margin: 0 auto;
+  border-inline: 1px solid #e5e4e7;
+  text-align: center;
 }
 
 .dashboard-header {
-  margin-bottom: 20px;
-  padding: 22px 26px;
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
-}
-
-.dashboard-header h1,
-.section-heading h2 {
-  margin: 4px 0 0;
-  color: #202b3d;
-  letter-spacing: -0.5px;
-}
-
-.dashboard-kicker {
-  color: #1a73e8;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.dashboard-user {
-  color: #374151;
-  font-size: 14px;
-  text-align: right;
-}
-
-.dashboard-signout,
-.dialog-cancel {
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: #fff;
-  color: #374151;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.dashboard-notice {
-  margin: 0 0 22px;
-  border-radius: 8px;
-}
-
-.dashboard-section {
-  padding: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
-}
-
-.account-summary {
-  color: #4b5563;
-  font-size: 14px;
-  text-align: right;
-}
-
-.account-summary strong {
-  color: #202b3d;
-}
-
-.lane-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 16px;
-  margin-top: 24px;
-}
-
-.lane-card {
   display: flex;
-  min-height: 200px;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 20px;
-  border: 1px solid #dfe5ec;
-  border-radius: 10px;
-  background: #fff;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
 }
 
-.lane-card--reserved {
-  border-color: #f0c46b;
-  background: #fffaf0;
-}
-
-.lane-title {
+.dashboard-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
   margin: 0;
-  color: #202b3d;
-  font-size: 20px;
-  font-weight: 700;
+  gap: 8px;
 }
 
-.lane-status {
+.dashboard-nav a {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  color: #176b3a;
-  font-size: 14px;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.9rem;
   font-weight: 700;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
 }
 
-.lane-status::before {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #23a455;
-  content: "";
+.dashboard-nav a:hover {
+  background: #1d4ed8;
 }
 
-.lane-card--reserved .lane-status {
-  color: #8a5700;
+.dashboard-nav a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
 }
 
-.lane-card--reserved .lane-status::before {
-  background: #e5a000;
+.dashboard-nav .dashboard-user {
+  padding: 10px 12px;
+  color: #111827;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
-.lane-details {
-  margin: 0;
-  color: #4b5563;
-  font-size: 13px;
-  line-height: 1.5;
+.statusLegend {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  padding: 8px 12px;
+  margin: 12px 0 0 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  box-sizing: border-box;
 }
 
-.lane-action {
-  width: 100%;
-  min-height: 42px;
-  margin-top: auto;
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #000;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.lane-action:disabled {
-  background: #e5e7eb;
-  color: #4b5563;
-  cursor: not-allowed;
+.legendIcon {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.demo-notice {
+  padding: 8px 12px;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 6px;
+  background: #fff7ed;
+  color: #7c2d12;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  text-align: left;
 }
 
 .dashboard-message {
-  margin-top: 20px;
-  padding: 12px 14px;
-  border-radius: 6px;
-  background: #e8f5e9;
-  color: #1b5e20;
-  font-size: 14px;
+  position: fixed;
+  z-index: 1001;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.45);
 }
 
-.dashboard-message[data-error="true"] {
-  background: #f8d7d8;
-  color: #8b1a1a;
+.dashboard-message[hidden] {
+  display: none;
+}
+
+.dashboard-message-content {
+  width: min(320px, calc(100vw - 32px));
+  padding: 18px 16px;
+  border: 1px solid rgba(251, 146, 60, 0.6);
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #7c2d12;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.dashboard-message[data-error="false"] .dashboard-message-content {
+  border-color: rgba(34, 197, 94, 0.5);
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.lanesContainer {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  gap: 10px;
+  width: 100%;
+  min-height: 80vh;
+  margin: 5px 0 0;
+}
+
+.laneCard {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.laneButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 75%;
+  min-height: 0;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  font-size: clamp(0.7rem, 1.2vw, 1rem);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.laneButton.is-vacant {
+  background: #22c55e;
+}
+
+.laneButton.is-occupied {
+  background: #ef4444;
+  cursor: not-allowed;
+}
+
+.laneButton.is-clicked {
+  background: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
+  cursor: default;
+}
+
+.laneButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.laneButton:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 2px;
+}
+
+.laneButton:disabled {
+  cursor: not-allowed;
+}
+
+.laneButtonContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: #fff;
+  font-weight: 700;
+}
+
+.laneButtonState {
+  font-size: 0.78em;
+  font-weight: 600;
+}
+
+.lane-owner {
+  font-size: 1em;
+}
+
+.timeSelectorGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: rgba(13, 17, 33, 0.38);
+}
+
+.timeLabel {
+  color: #f5f5f5;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.timeSelector {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+  font-size: 0.82rem;
+}
+
+.laneReservationDetails {
+  min-height: 2.6em;
+  margin: 0;
+  color: #111827;
+  font-size: 0.68rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.laneCancelButton {
+  padding: 5px 7px;
+  border: 0;
+  border-radius: 5px;
+  background: #6b7280;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.laneCancelButton:hover {
+  background: #4b5563;
+}
+
+footer {
+  margin-top: auto;
+  padding: 12px;
+  color: #111827;
+  font-size: 0.75rem;
+}
+
+footer p {
+  margin: 0;
 }
 
 .reservation-dialog {
-  width: min(440px, calc(100% - 32px));
-  max-width: none;
-  padding: 26px;
-  border: 1px solid #d1d5db;
-  border-radius: 12px;
-  color: #202b3d;
+  width: min(360px, calc(100vw - 32px));
+  padding: 26px 24px 20px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 14px;
+  background: #fff;
+  color: #111827;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+  text-align: center;
 }
 
 .reservation-dialog::backdrop {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.55);
 }
 
 .reservation-dialog form {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
 .reservation-dialog h2 {
-  margin: 0;
-  font-size: 23px;
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 1.1rem;
+  font-weight: 800;
 }
 
 .reservation-dialog label {
-  margin-top: 6px;
   color: #374151;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.reservation-dialog input,
-.reservation-dialog select {
-  background: #fff;
-  color: #202b3d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: left;
 }
 
 .dialog-help {
-  color: #5f6368;
-  font-size: 14px;
+  margin: 0 0 8px;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.reservation-dialog .input-field {
+  min-height: 42px;
+  padding: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  font-size: 0.85rem;
+}
+
+.reservation-dialog .form-error {
+  margin: 0;
 }
 
 .dialog-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 12px;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.dialog-actions .form-btn--submit {
+.dialog-actions button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.dialog-actions .dialog-cancel {
+  background: #6b7280;
+}
+
+.info-dialog {
+  width: min(360px, calc(100vw - 32px));
+  padding: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  border-radius: 14px;
+  background: #fff;
+  color: #111827;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+}
+
+.info-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.info-dialog h2 {
   margin-top: 0;
-  padding-inline: 16px;
 }
 
-@media (max-width: 640px) {
-  .demo-dashboard-page {
-    width: min(100% - 20px, 520px);
-    padding-top: 10px;
+.info-dialog button {
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .lanesContainer {
+    flex-wrap: wrap;
+    min-height: 0;
+    padding: 0 8px;
+    box-sizing: border-box;
   }
 
-  .dashboard-header,
-  .section-heading {
-    align-items: flex-start;
-    flex-direction: column;
+  .laneCard {
+    flex: 1 1 calc(33.333% - 10px);
+    min-width: 135px;
+    min-height: 340px;
   }
 
-  .dashboard-user {
+  .laneButton {
+    flex: 1;
     width: 100%;
-    justify-content: space-between;
-    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-header {
+    justify-content: center;
   }
 
-  .account-summary {
-    text-align: left;
+  .dashboard-nav ul {
+    justify-content: center;
   }
 
-  .dashboard-header,
-  .dashboard-section {
-    padding: 20px;
+  .dashboard-nav a {
+    padding: 9px 13px;
+  }
+
+  .statusLegend {
+    margin-inline: auto;
+  }
+
+  .laneCard {
+    flex-basis: calc(50% - 10px);
+    min-width: 125px;
   }
 }
