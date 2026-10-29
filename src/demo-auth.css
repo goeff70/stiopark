@@ -49,44 +49,6 @@
   cursor: pointer;
 }
 
-.demo-success {
-  padding: 12px;
-  border-radius: 6px;
-  background: #e8f5e9;
-  color: #1b5e20;
-  font-size: 14px;
-}
-
-.demo-dashboard dl {
-  display: grid;
-  gap: 12px;
-  margin: 0;
-}
-
-.demo-dashboard dl > div {
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.demo-dashboard dt {
-  color: #5f6368;
-  font-size: 13px;
-}
-
-.demo-dashboard dd {
-  margin: 2px 0 0;
-  color: #202b3d;
-  overflow-wrap: anywhere;
-}
-
-.demo-limitation {
-  padding: 12px;
-  border-radius: 6px;
-  background: #f3f4f6;
-  color: #374151;
-  font-size: 13px;
-}
-
 @media (max-width: 480px) {
   .demo-notice {
     margin: -40px -20px 24px;

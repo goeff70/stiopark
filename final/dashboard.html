@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="oPark browser-only parking reservation demo."
+    />
+    <title>oPark Demo Dashboard</title>
+    <link rel="stylesheet" href="./src/login/style.css" />
+    <link rel="stylesheet" href="./src/demo-auth.css" />
+    <link rel="stylesheet" href="./src/demo-dashboard.css" />
+    <script type="module" src="./src/demo-dashboard.js"></script>
+  </head>
+  <body>
+    <main class="demo-dashboard-page">
+      <header class="dashboard-header">
+        <div>
+          <p class="dashboard-kicker">STI College · oPark</p>
+          <h1>Parking Dashboard</h1>
+        </div>
+        <div class="dashboard-user">
+          <span id="dashboard-user-name"></span>
+          <button type="button" class="dashboard-signout" id="signout-button">Sign Out</button>
+        </div>
+      </header>
+
+      <aside class="demo-notice dashboard-notice">
+        Browser demo only: lane availability and reservations are saved on this
+        device. They are not live, shared, or connected to the parking sensors.
+      </aside>
+
+      <section class="dashboard-section" aria-labelledby="lane-heading">
+        <div class="section-heading">
+          <div>
+            <p class="dashboard-kicker">Reservations</p>
+            <h2 id="lane-heading">Choose a parking lane</h2>
+          </div>
+          <p class="account-summary">
+            Signed in as <strong id="dashboard-user-email"></strong>
+            <span> · Plate <strong id="dashboard-user-plate"></strong></span>
+          </p>
+        </div>
+        <p id="dashboard-message" class="dashboard-message" role="status" aria-live="polite" hidden></p>
+        <div id="lane-list" class="lane-list" aria-live="polite"></div>
+      </section>
+
+      <dialog id="reservation-dialog" class="reservation-dialog">
+        <form id="reservation-form">
+          <h2 id="reservation-title">Reserve a lane</h2>
+          <p class="dialog-help">Choose a purpose and reservation time.</p>
+          <p id="reservation-error" class="form-error" role="alert" hidden></p>
+
+          <label for="reservation-purpose">Purpose</label>
+          <select id="reservation-purpose" class="input-field select-field" required>
+            <option value="" selected disabled>Select a purpose</option>
+            <option value="Enrollment">Enrollment</option>
+            <option value="Payment">Payment</option>
+            <option value="Classes">Classes</option>
+            <option value="TESDA">TESDA</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="reservation-start">Start</label>
+          <input id="reservation-start" class="input-field" type="datetime-local" required />
+          <label for="reservation-end">End</label>
+          <input id="reservation-end" class="input-field" type="datetime-local" required />
+
+          <div class="dialog-actions">
+            <button type="button" class="dialog-cancel" id="close-dialog">Cancel</button>
+            <button type="submit" class="form-btn form-btn--submit">Confirm reservation</button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+  </body>
+</html>

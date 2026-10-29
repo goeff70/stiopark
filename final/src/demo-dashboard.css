@@ -1,0 +1,256 @@
+body {
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.demo-dashboard-page {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 56px;
+}
+
+.dashboard-header,
+.section-heading,
+.dashboard-user {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.dashboard-header {
+  margin-bottom: 20px;
+  padding: 22px 26px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+}
+
+.dashboard-header h1,
+.section-heading h2 {
+  margin: 4px 0 0;
+  color: #202b3d;
+  letter-spacing: -0.5px;
+}
+
+.dashboard-kicker {
+  color: #1a73e8;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dashboard-user {
+  color: #374151;
+  font-size: 14px;
+  text-align: right;
+}
+
+.dashboard-signout,
+.dialog-cancel {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashboard-notice {
+  margin: 0 0 22px;
+  border-radius: 8px;
+}
+
+.dashboard-section {
+  padding: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+}
+
+.account-summary {
+  color: #4b5563;
+  font-size: 14px;
+  text-align: right;
+}
+
+.account-summary strong {
+  color: #202b3d;
+}
+
+.lane-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.lane-card {
+  display: flex;
+  min-height: 200px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid #dfe5ec;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.lane-card--reserved {
+  border-color: #f0c46b;
+  background: #fffaf0;
+}
+
+.lane-title {
+  margin: 0;
+  color: #202b3d;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.lane-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #176b3a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.lane-status::before {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #23a455;
+  content: "";
+}
+
+.lane-card--reserved .lane-status {
+  color: #8a5700;
+}
+
+.lane-card--reserved .lane-status::before {
+  background: #e5a000;
+}
+
+.lane-details {
+  margin: 0;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lane-action {
+  width: 100%;
+  min-height: 42px;
+  margin-top: auto;
+}
+
+.lane-action:disabled {
+  background: #e5e7eb;
+  color: #4b5563;
+  cursor: not-allowed;
+}
+
+.dashboard-message {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-size: 14px;
+}
+
+.dashboard-message[data-error="true"] {
+  background: #f8d7d8;
+  color: #8b1a1a;
+}
+
+.reservation-dialog {
+  width: min(440px, calc(100% - 32px));
+  max-width: none;
+  padding: 26px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  color: #202b3d;
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.28);
+}
+
+.reservation-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.reservation-dialog form {
+  display: grid;
+  gap: 10px;
+}
+
+.reservation-dialog h2 {
+  margin: 0;
+  font-size: 23px;
+}
+
+.reservation-dialog label {
+  margin-top: 6px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.reservation-dialog input,
+.reservation-dialog select {
+  background: #fff;
+  color: #202b3d;
+}
+
+.dialog-help {
+  color: #5f6368;
+  font-size: 14px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.dialog-actions .form-btn--submit {
+  margin-top: 0;
+  padding-inline: 16px;
+}
+
+@media (max-width: 640px) {
+  .demo-dashboard-page {
+    width: min(100% - 20px, 520px);
+    padding-top: 10px;
+  }
+
+  .dashboard-header,
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-user {
+    width: 100%;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  .account-summary {
+    text-align: left;
+  }
+
+  .dashboard-header,
+  .dashboard-section {
+    padding: 20px;
+  }
+}

@@ -7,7 +7,6 @@ const platePattern = /^[A-Z0-9](?:[A-Z0-9 -]{0,18}[A-Z0-9])?$/
 const panels = {
   login: document.getElementById('login-panel'),
   signup: document.getElementById('signup-panel'),
-  dashboard: document.getElementById('dashboard-panel'),
 }
 
 function getAccounts() {
@@ -69,7 +68,7 @@ function showPanel(name) {
   })
 
   document.getElementById('page-title').textContent =
-    name === 'login' ? 'Welcome Back' : name === 'signup' ? 'Create an Account' : 'Demo Account'
+    name === 'login' ? 'Welcome Back' : 'Create an Account'
 }
 
 function showError(formName, message) {
@@ -96,15 +95,7 @@ function startSession(account, remember) {
   } else {
     localStorage.removeItem(REMEMBERED_USER_KEY)
   }
-  showAccount(account)
-}
-
-function showAccount(account) {
-  document.querySelector('[data-account="name"]').textContent = account.name
-  document.querySelector('[data-account="email"]').textContent = account.email
-  document.querySelector('[data-account="plate"]').textContent = account.plate
-  document.querySelector('[data-account="role"]').textContent = account.role
-  showPanel('dashboard')
+  window.location.assign('./dashboard.html')
 }
 
 document.querySelectorAll('[data-show]').forEach((link) => {
@@ -191,19 +182,12 @@ document.getElementById('login-form').addEventListener('submit', async (event) =
   }
 })
 
-document.getElementById('signout-button').addEventListener('click', () => {
-  sessionStorage.removeItem(SESSION_KEY)
-  localStorage.removeItem(REMEMBERED_USER_KEY)
-  document.getElementById('login-form').reset()
-  showPanel('login')
-})
-
 try {
   const accounts = getAccounts()
   const email = sessionStorage.getItem(SESSION_KEY) || localStorage.getItem(REMEMBERED_USER_KEY)
   const account = accounts.find((savedAccount) => savedAccount.email === email)
   if (account) {
-    showAccount(account)
+    window.location.replace('./dashboard.html')
   } else {
     sessionStorage.removeItem(SESSION_KEY)
     localStorage.removeItem(REMEMBERED_USER_KEY)
