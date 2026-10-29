@@ -64,3 +64,4 @@ vite-opark/
 ```
 
 Keep the project in this single root folder when uploading it to GitHub. Its internal folders are required for the application to work.
+# tutorial-with-gitbash
