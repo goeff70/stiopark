@@ -1,0 +1,279 @@
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <HTTPClient.h>
+
+const char* wifiSsid = "YOUR_WIFI_SSID";
+const char* wifiPassword = "YOUR_WIFI_PASSWORD";
+const char* apiUrl = "http://192.168.1.15/vite-opark/src/lanes_api.php?device=sync";
+const char* deviceApiToken = "YOUR_DEVICE_API_TOKEN";
+
+// Pin map for a classic ESP32-WROOM DevKit.
+// Level-shift each HC-SR04 ECHO output to 3.3 V
+// before connecting it to an ESP32 input.
+
+const int i2cSdaPin = 21;
+const int i2cSclPin = 22;
+
+// -------------------- PCA9685 --------------------
+Adafruit_PWMServoDriver pca = Adafruit_PWMServoDriver();
+
+const int servoPins[4] = {0, 1, 2, 3};
+
+// Continuous rotation servo calibration (for servos 0,2,3)
+#define SERVO_STOP 90
+#define SERVO_FORWARD 180
+#define SERVO_BACKWARD 0
+
+#define SERVOMIN 120
+#define SERVOMAX 520
+
+#define PWM_FREQ 50
+
+// -------------------- 74HC595 --------------------
+const int dataPin  = 26;
+const int clockPin = 27;
+const int latchPin = 32;
+
+uint16_t leds = 0;
+
+// -------------------- HC-SR04 --------------------
+const int trigPins[4] = {18, 19, 23, 25};
+
+// CHANGED: GPIO 33 replaces GPIO 39 for Sensor 4 ECHO
+const int echoPins[4] = {34, 35, 4, 33};
+
+// -------------------- BUTTONS --------------------
+const int buttonPins[4] = {13, 14, 16, 17};
+
+bool reserved[4] = {false, false, false, false};
+bool lastButtonState[4] = {HIGH, HIGH, HIGH, HIGH};
+bool pendingReservationSync[4] = {false, false, false, false};
+bool desiredReserved[4] = {false, false, false, false};
+String sensorStatus[4] = {"unknown", "unknown", "unknown", "unknown"};
+unsigned long lastApiSync = 0;
+
+// Track servo state
+bool gateOpen[4] = {false, false, false, false};
+
+// Distance threshold
+const int threshold = 20; // cm
+
+// -------------------- SETUP --------------------
+void setup() {
+  WiFi.mode(WIFI_STA);
+  WiFi.setAutoReconnect(true);
+  WiFi.begin(wifiSsid, wifiPassword);
+
+  pinMode(dataPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(latchPin, OUTPUT);
+
+  for (int i = 0; i < 4; i++) {
+    pinMode(trigPins[i], OUTPUT);
+    pinMode(echoPins[i], INPUT);
+  }
+
+  for (int i = 0; i < 4; i++) {
+    pinMode(buttonPins[i], INPUT_PULLUP);
+  }
+
+  Wire.begin(i2cSdaPin, i2cSclPin);
+  pca.begin();
+  pca.setPWMFreq(PWM_FREQ);
+
+  delay(10);
+
+  // Stop continuous servos
+  setServoAngle(0, SERVO_STOP);
+  setServoAngle(2, SERVO_STOP);
+  setServoAngle(3, SERVO_STOP);
+
+  // Center positional servo (Servo 2)
+  setServoAngle(1, 0);
+}
+
+// -------------------- LOOP --------------------
+void loop() {
+
+  leds = 0;
+
+  for (int i = 0; i < 4; i++) {
+
+    bool currentButtonState = digitalRead(buttonPins[i]);
+
+    if (lastButtonState[i] == HIGH && currentButtonState == LOW) {
+      bool currentTarget = pendingReservationSync[i] ? desiredReserved[i] : reserved[i];
+      desiredReserved[i] = !currentTarget;
+      pendingReservationSync[i] = true;
+      delay(200);
+    }
+
+    lastButtonState[i] = currentButtonState;
+
+    float distance = getDistance(trigPins[i], echoPins[i]);
+    if (distance > 0) {
+      sensorStatus[i] = distance < threshold ? "occupied" : "vacant";
+    } else {
+      sensorStatus[i] = "unknown";
+    }
+
+    if (reserved[i]) {
+      setLEDColor(i, 0, 0, 255); // BLUE
+    } else if (sensorStatus[i] == "occupied") {
+        setLEDColor(i, 255, 0, 0); // RED
+    } else if (sensorStatus[i] == "vacant") {
+        setLEDColor(i, 0, 255, 0); // GREEN
+    }
+  }
+
+  updateShiftRegister();
+
+  bool pendingButton = false;
+  for (int i = 0; i < 4; i++) {
+    pendingButton = pendingButton || pendingReservationSync[i];
+  }
+
+  if (pendingButton || millis() - lastApiSync >= 1000) {
+    lastApiSync = millis();
+    syncWithServer();
+  }
+
+  delay(100);
+}
+
+// -------------------- DATABASE SYNC --------------------
+void syncWithServer() {
+  if (WiFi.status() != WL_CONNECTED) return;
+
+  WiFiClient client;
+  HTTPClient http;
+  http.setTimeout(1500);
+
+  if (!http.begin(client, apiUrl)) return;
+
+  http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+  http.addHeader("X-Device-Token", deviceApiToken);
+
+  String payload;
+  for (int i = 0; i < 4; i++) {
+    if (i > 0) payload += '&';
+    payload += "sensor_" + String(i + 1) + "=" + sensorStatus[i];
+    if (pendingReservationSync[i]) {
+      payload += "&reserved_" + String(i + 1) + "=";
+      payload += desiredReserved[i] ? '1' : '0';
+    }
+  }
+
+  int responseCode = http.POST(payload);
+  if (responseCode == HTTP_CODE_OK) {
+    String response = http.getString();
+    String states[4];
+    int offset = 0;
+    bool validResponse = true;
+
+    for (int i = 0; i < 4; i++) {
+      int comma = response.indexOf(',', offset);
+      int end = comma < 0 ? response.length() : comma;
+      states[i] = response.substring(offset, end);
+      states[i].trim();
+      if ((i < 3 && comma < 0) || (states[i] != "0" && states[i] != "1")) {
+        validResponse = false;
+        break;
+      }
+      offset = end + 1;
+    }
+
+    if (validResponse) {
+      for (int i = 0; i < 4; i++) {
+        bool serverReserved = states[i] == "1";
+        if (serverReserved != reserved[i]) {
+          rotateServo90(i, serverReserved);
+          reserved[i] = serverReserved;
+          gateOpen[i] = serverReserved;
+        }
+        pendingReservationSync[i] = false;
+      }
+    }
+  }
+
+  http.end();
+}
+
+// -------------------- DISTANCE FUNCTION --------------------
+float getDistance(int trig, int echo) {
+
+  digitalWrite(trig, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trig, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trig, LOW);
+
+  long duration = pulseIn(echo, HIGH, 30000);
+
+  if (duration == 0) return -1;
+
+  return duration * 0.034 / 2;
+}
+
+// -------------------- LED CONTROL --------------------
+void setLEDColor(int ledIndex, int r, int g, int b) {
+
+  int baseBit;
+
+  if (ledIndex == 0) baseBit = 0;
+  else if (ledIndex == 1) baseBit = 3;
+  else if (ledIndex == 2) baseBit = 8;
+  else baseBit = 11;
+
+  if (r > 0) leds |= (1 << baseBit);
+  if (g > 0) leds |= (1 << (baseBit + 1));
+  if (b > 0) leds |= (1 << (baseBit + 2));
+}
+
+// -------------------- SHIFT REGISTER --------------------
+void updateShiftRegister() {
+
+  digitalWrite(latchPin, LOW);
+
+  shiftOut(dataPin, clockPin, MSBFIRST, leds >> 8);
+  shiftOut(dataPin, clockPin, MSBFIRST, leds & 0xFF);
+
+  digitalWrite(latchPin, HIGH);
+}
+
+// -------------------- SERVO ROTATION --------------------
+void rotateServo90(int servoIndex, bool openGate) {
+
+  // Servo 2 (index 1) is POSITIONAL
+  if (servoIndex == 1) {
+
+    if (openGate) setServoAngle(1, 90);
+    else setServoAngle(1, 0);
+
+    return;
+  }
+
+  // Continuous rotation servos
+  if (openGate) {
+    setServoAngle(servoIndex, SERVO_FORWARD);
+    delay(150);
+  } else {
+    setServoAngle(servoIndex, SERVO_BACKWARD);
+    delay(155);
+  }
+
+  setServoAngle(servoIndex, SERVO_STOP);
+}
+
+// -------------------- SERVO CONTROL --------------------
+void setServoAngle(int servoIndex, int angle) {
+
+  angle = constrain(angle, 0, 180);
+
+  int pwm = map(angle, 0, 180, SERVOMIN, SERVOMAX);
+
+  pca.setPWM(servoPins[servoIndex], 0, pwm);
+}

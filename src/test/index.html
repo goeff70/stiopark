@@ -1,0 +1,154 @@
+<?php
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ./login/index.php');
+    exit();
+}
+?>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>USER-opark</title>
+    <style>
+      :root {
+        --text: #f8fd73;
+        --text-h: #08060d;
+        --bg: #fff;
+        --border: #e5e4e7;
+        --code-bg: #f4f3ec;
+        --accent: #aa3bff;
+        --accent-bg: rgba(170, 59, 255, 0.1);
+        --accent-border: rgba(170, 59, 255, 0.5);
+        --social-bg: rgba(244, 243, 236, 0.5);
+        --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+        --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+        --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+        --mono: ui-monospace, Consolas, monospace;
+        font: 18px/145% var(--sans);
+        letter-spacing: 0.18px;
+        color-scheme: light dark;
+        color: var(--text);
+        background: var(--bg);
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --text: #0800ff;
+          --text-h: #f3f4f6;
+          --bg: #16171d;
+          --border: #2e303a;
+          --code-bg: #1f2028;
+          --accent: #c084fc;
+          --accent-bg: rgba(192, 132, 252, 0.15);
+          --accent-border: rgba(192, 132, 252, 0.5);
+          --social-bg: rgba(47, 48, 58, 0.5);
+          --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+        }
+      }
+      @media (max-width: 1024px) {
+        :root {
+          font-size: 16px;
+        }
+      }
+      body {
+        background-image: url(assets/bg.png);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-attachment: fixed;
+        margin: 0;
+      }
+      #root {
+        width: 1126px;
+        max-width: 100%;
+        margin: 0 auto;
+        text-align: center;
+        border-inline: 1px solid var(--border);
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      nav ul {
+        display: flex;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        gap: 15px;
+      }
+      nav a {
+        color: var(--text);
+        text-decoration: none;
+      }
+      .lanesContainer {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        min-height: 80vh;
+        margin: 5px 0 0 0;
+        align-items: stretch;
+      }
+      .laneButton {
+        background-color: hsla(249, 65%, 40%, 0.736);
+        color: rgb(235, 0, 0);
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        flex: 1;
+        min-height: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: clamp(0.7rem, 1.2vw, 1rem);
+      }
+      .laneButton a {
+        color: rgb(255, 255, 0);
+        text-decoration: none;
+      }
+      footer {
+        margin-top: auto;
+      }
+      footer p {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <header>
+        <nav>
+          <ul>
+            <li><a href="http://localhost/vite-opark/src/login/index.php">Logout</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Services</a></li>
+          </ul>
+        </nav>
+      </header>
+      <div class="lanesContainer">
+        <button class="laneButton"><a href="#">Lane 1</a></button>
+        <button class="laneButton"><a href="#">Lane 2</a></button>
+        <button class="laneButton"><a href="#">Lane 3</a></button>
+        <button class="laneButton"><a href="#">Lane 4</a></button>
+        <button class="laneButton"><a href="#">Lane 5</a></button>
+      </div>
+      <footer>
+        <p>&copy; <?php echo date('Y'); ?> STI College Malaybalay</p>
+      </footer>
+    </div>
+  </body>
+</html>

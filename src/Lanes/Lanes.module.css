@@ -1,0 +1,29 @@
+.lanesContainer {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    min-height: 80vh;
+    margin: 5px 0 0 0;
+    align-items: stretch;
+}
+
+.button {
+    background-color: hsla(249, 65%, 40%, 0.736);
+    color: rgb(235, 0, 0);
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    min-height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(0.7rem, 1.2vw, 1rem);
+}
+
+.button a {
+    color: rgb(255, 255, 0);
+    text-decoration: none;
+}
