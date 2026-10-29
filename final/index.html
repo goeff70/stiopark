@@ -3,15 +3,105 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./src/index.css" />
-    <title>Welcome to oPark</title>
+    <meta
+      name="description"
+      content="oPark browser-only demo sign in. Accounts are saved only in this browser."
+    />
+    <title>oPark Demo Login</title>
+    <link rel="stylesheet" href="./src/login/style.css" />
+    <link rel="stylesheet" href="./src/demo-auth.css" />
+    <script type="module" src="./src/demo-auth.js"></script>
   </head>
   <body>
-    <main class="welcome-page">
-      <div class="welcome-content">
-        <p class="welcome-kicker">STI College</p>
-        <h1>Welcome to oPark</h1>
-        <p class="welcome-button">Login requires PHP hosting</p>
+    <main class="container demo-container">
+      <div class="form-container demo-card">
+        <aside class="demo-notice">
+          Demo only: accounts are saved in this browser and are not secure or shared
+          with other devices. Do not use a real password.
+        </aside>
+
+        <header class="form-header">
+          <p>STI College · oPark</p>
+          <h1 id="page-title">Welcome Back</h1>
+        </header>
+
+        <section class="form-box" id="login-panel">
+          <form id="login-form">
+            <p class="form-error" id="login-error" role="alert" hidden></p>
+            <div class="input-group">
+              <input type="text" id="login-plate" class="input-field" placeholder=" " maxlength="20" autocomplete="off" required />
+              <label for="login-plate" class="floating-label">Plate number</label>
+            </div>
+            <div class="input-group">
+              <input type="email" id="login-email" class="input-field" placeholder=" " autocomplete="email" required />
+              <label for="login-email" class="floating-label">Email address</label>
+            </div>
+            <div class="input-group">
+              <input type="password" id="login-password" class="input-field" placeholder=" " autocomplete="current-password" required />
+              <label for="login-password" class="floating-label">Password</label>
+            </div>
+            <div class="input-group checkbox-group">
+              <label class="remember-me" for="remember-me">
+                <input type="checkbox" id="remember-me" />
+                Remember me on this device
+              </label>
+            </div>
+            <button type="submit" class="form-btn form-btn--submit">Sign In</button>
+          </form>
+          <div class="form-bottom">
+            <p>Don't have an account? <a href="#signup" class="form-link" data-show="signup">Sign up</a></p>
+          </div>
+        </section>
+
+        <section class="form-box" id="signup-panel" hidden>
+          <form id="signup-form">
+            <p class="form-error" id="signup-error" role="alert" hidden></p>
+            <div class="input-group">
+              <input type="text" id="signup-name" class="input-field" placeholder=" " autocomplete="name" required />
+              <label for="signup-name" class="floating-label">Full name</label>
+            </div>
+            <div class="input-group">
+              <input type="email" id="signup-email" class="input-field" placeholder=" " autocomplete="email" required />
+              <label for="signup-email" class="floating-label">Email address</label>
+            </div>
+            <div class="input-group">
+              <input type="text" id="signup-plate" class="input-field" placeholder=" " maxlength="20" autocomplete="off" required />
+              <label for="signup-plate" class="floating-label">Plate number</label>
+            </div>
+            <div class="input-group">
+              <input type="password" id="signup-password" class="input-field" placeholder=" " autocomplete="new-password" minlength="8" required />
+              <label for="signup-password" class="floating-label">Password (8+ characters)</label>
+            </div>
+            <div class="input-group">
+              <label for="signup-role" class="floating-label floating-label--select">I am a</label>
+              <select id="signup-role" class="input-field select-field" required>
+                <option value="" selected disabled></option>
+                <option value="student">Student</option>
+                <option value="employee">Employee</option>
+                <option value="guest">Guest</option>
+              </select>
+            </div>
+            <button type="submit" class="form-btn form-btn--submit">Create demo account</button>
+          </form>
+          <div class="form-bottom">
+            <p>Already have an account? <a href="#login" class="form-link" data-show="login">Sign in</a></p>
+          </div>
+        </section>
+
+        <section class="form-box demo-dashboard" id="dashboard-panel" hidden>
+          <p class="demo-success" role="status">You are signed in to this browser demo.</p>
+          <dl>
+            <div><dt>Name</dt><dd data-account="name"></dd></div>
+            <div><dt>Email</dt><dd data-account="email"></dd></div>
+            <div><dt>Plate number</dt><dd data-account="plate"></dd></div>
+            <div><dt>Account type</dt><dd data-account="role"></dd></div>
+          </dl>
+          <p class="demo-limitation">
+            Parking reservations and account data from the PHP/MySQL app are not
+            available in this browser-only demo.
+          </p>
+          <button type="button" class="form-btn form-btn--submit" id="signout-button">Sign Out</button>
+        </section>
       </div>
     </main>
   </body>

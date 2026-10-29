@@ -2,7 +2,7 @@
 
 oPark is a parking reservation application built with PHP, MySQL, React, and Vite. PHP serves the application pages and API; React/Vite builds the client interface.
 
-> **Hosting note:** GitHub can store this project as a repository, but GitHub Pages cannot run PHP or MySQL. The complete application needs a PHP/MySQL host such as XAMPP, or another web host with PHP and MySQL support. Uploading the files to GitHub does not make the backend run as a live website.
+> **GitHub Pages demo:** The static entry page provides browser-only demo accounts stored in local storage on that browser. This is not secure authentication and does not share accounts or reservations across devices. Do not use real passwords or sensitive information. The complete PHP/MySQL application still needs a PHP/MySQL host.
 
 ## Upload this folder to GitHub
 
